@@ -58,32 +58,24 @@ src/
 server.js                (Node服务器)
 ```
 
+- 只渲染初始状态，不执行客户端交互
+- 需要配合 hydrate 进行客户端激活
+- 服务端和客户端代码需要同构
+
 核心实现：
 ```javascript
-// entry-server.js
-export default function createApp() {
-  const app = createSSRApp(App)
-  const router = createRouter({ history: createMemoryHistory() })
-  app.use(router)
-  return { app, router }
-}
+import { renderToString } from 'vue/server-renderer'
+import { createApp } from 'vue'
 
-// server.js
-import createApp from './src/entry-server.js'
-
-app.get('*', async (req, res) => {
-  const { app, router } = createApp()
-  await router.push(req.url)
-  await router.isReady()
-  const html = await renderToString(app)
-  res.send(`<div id="app">${html}</div>`)
+const app = createApp({
+  template: '<div>{{ message }}</div>',
+  data() {
+    return { message: 'Hello SSR!' }
+  }
 })
 
-// entry-client.js
-import createApp from './entry-server.js'
-
-const { app } = createApp()
-app.mount('#app')
+const html = await renderToString(app)
+// html = '<div>Hello SSR!</div>'
 ```
 
 9. Vite 项目配置与优化
@@ -170,18 +162,17 @@ export default defineConfig(({ mode }) => {
 })
 ```
 
-关键优化点：
-* **代码分割**：Vue 核心库、第三方库、业务代码分别打包，提升缓存命中率
-* **资源分类**：JS/CSS/图片分目录存放，便于 CDN 配置和缓存策略
-* **文件 Hash**：文件名带 hash 值，内容不变则 hash 不变，实现长期缓存
-* **代理配置**：开发环境通过 proxy 解决跨域问题
-* **压缩优化**：使用 esbuild 压缩（速度快），移除 console 和 debugger
-* **按需加载**：路由懒加载 `() => import()` 减少首屏体积
-
-优化效果：
-* 首屏加载减少 40-60%
-* 打包体积减少 30-50%
-* 缓存命中率提升到 80%+
+```
+function decideOptimization(type){
+  switch(type){
+    case '首屏慢': return 'SSR/预渲染+路由与组件懒加载+代码分割+关键资源预加载';
+    case '交互卡': return '虚拟列表+节流防抖+减少重渲染+v-memo/缓存计算';
+    case '特定页慢': return '拆组件+按需加载第三方库+keep-alive/分页/服务端分页';
+    case '网络慢': return 'CDN+Gzip/Brotli+图片WebP懒加载+HTTP/2/3+缓存头';
+    default: return '先量化指标与分析瓶颈再对症优化';
+  }
+}
+```
 
 10. 前端权限管理
 核心实现：

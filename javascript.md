@@ -95,7 +95,6 @@ function deepClone(obj, hash = new WeakMap()) {
 * slice() - 截取数组片段，返回新数组
 * join() - 数组转字符串
 * indexOf() - 查找元素索引，找不到返回-1
-* lastIndexOf() - 从后往前查找元素索引
 * includes() - 判断是否包含元素，返回布尔值
 
 ## 遍历方法
@@ -107,13 +106,11 @@ function deepClone(obj, hash = new WeakMap()) {
 * some() - 判断是否有元素满足条件
 * every() - 判断是否所有元素都满足条件
 * reduce() - 累加器，返回单个值
-* reduceRight() - 从右往左累加
 
 7. 字符串的常用方法
 
 ## 查找和匹配
 * indexOf() - 查找子字符串位置，找不到返回-1
-* lastIndexOf() - 从后往前查找子字符串位置
 * includes() - 判断是否包含子字符串，返回布尔值
 * startsWith() - 判断是否以指定字符串开头
 * endsWith() - 判断是否以指定字符串结尾
@@ -128,8 +125,6 @@ function deepClone(obj, hash = new WeakMap()) {
 ## 大小写转换
 * toUpperCase() - 转大写
 * toLowerCase() - 转小写
-* toLocaleUpperCase() - 本地化转大写
-* toLocaleLowerCase() - 本地化转小写
 
 ## 去除空白
 * trim() - 去除首尾空白字符
@@ -159,10 +154,9 @@ function deepClone(obj, hash = new WeakMap()) {
 ## 执行上下文 (Execution Context)
 * **全局执行上下文** - 代码开始执行时创建，只有一个
 * **函数执行上下文** - 每次调用函数时创建
-* **eval执行上下文** - eval()执行时创建
 
 ## 执行上下文包含
-* **变量对象(VO)** - 存储变量和函数声明
+* **变量对象** - 存储变量和函数声明
 * **作用域链** - 当前作用域到全局作用域的链
 * **this指向** - 当前执行环境的this值
 
@@ -311,12 +305,8 @@ function throttle(func, limit) {
 
 ## 执行顺序
 1. **同步代码** - 立即执行
-2. **微任务** - Promise.then、queueMicrotask
+2. **微任务** - Promise.then
 3. **宏任务** - setTimeout、setInterval、DOM事件
-
-## 任务类型
-* **宏任务** - setTimeout、setInterval、I/O操作
-* **微任务** - Promise.then、queueMicrotask、MutationObserver
 
 ## 执行流程
 1. 执行同步代码
@@ -417,6 +407,7 @@ console.log(person.toString());  // '[object Object]' - Object原型方法
 console.log(person.__proto__ === Person.prototype);           // true
 console.log(Person.prototype.__proto__ === Object.prototype); // true
 console.log(Object.prototype.__proto__ === null);             // true
+console.log(Object.prototype.constructor === Object);         // true
 ```
 
 ## 原型链查找规则
